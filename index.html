@@ -23,18 +23,15 @@
         }
         .container {
             background: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: 12px;
             text-align: center;
-            width: 350px;
+            width: 90%;
+            max-width: 350px;
             box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: transform 0.2s ease-in-out;
-        }
-        .container:hover {
-            transform: scale(1.02);
         }
         label {
             font-weight: bold;
@@ -43,7 +40,7 @@
             color: #003478;
         }
         input {
-            width: 90%;
+            width: 100%;
             padding: 12px;
             margin: 8px 0;
             border: 2px solid #003478;
@@ -51,17 +48,33 @@
             font-size: 16px;
             text-align: center;
             outline: none;
-            transition: border 0.3s ease;
         }
         input:focus {
             border: 2px solid #007bff;
+        }
+        .button {
+            margin-top: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+        }
+        .button:hover {
+            background: #0056b3;
         }
         p {
             font-weight: bold;
             color: #003478;
             margin-top: 15px;
             font-size: 18px;
-            min-height: 24px;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -76,10 +89,14 @@
         <input type="text" id="packageInput" oninput="scanPackage()" placeholder="Enter or scan package ID" disabled>
         
         <p id="result"></p>
+
+        <button class="button hidden" id="confirmButton" onclick="confirmDelivery()">✔ Confirm Delivery</button>
+        <button class="button hidden" id="downloadReport" onclick="downloadCSV()">📊 Download Report</button>
     </div>
 
     <script>
         let database = {};
+        let deliveries = [];
 
         function loadCSV() {
             fetch('data.csv')
@@ -96,6 +113,7 @@
         }
 
         let selectedRack = null;
+        let lastScannedPackage = null;
 
         function scanRack() {
             let rackID = document.getElementById("rackInput").value.trim();
@@ -106,20 +124,55 @@
                 packageInput.disabled = false;
                 packageInput.value = "";
                 document.getElementById("result").innerText = "";
+                document.getElementById("confirmButton").classList.add("hidden");
             } else {
                 selectedRack = null;
                 packageInput.disabled = true;
                 packageInput.value = "";
+                document.getElementById("confirmButton").classList.add("hidden");
             }
         }
 
         function scanPackage() {
             let packageID = document.getElementById("packageInput").value.trim();
+            let confirmButton = document.getElementById("confirmButton");
+
             if (selectedRack && selectedRack[packageID]) {
+                lastScannedPackage = { rackID: document.getElementById("rackInput").value, packageID, position: selectedRack[packageID] };
                 document.getElementById("result").innerText = "📦 Position: " + selectedRack[packageID];
+                confirmButton.classList.remove("hidden");
             } else {
+                lastScannedPackage = null;
                 document.getElementById("result").innerText = "❌ Package not found!";
+                confirmButton.classList.add("hidden");
             }
+        }
+
+        function confirmDelivery() {
+            if (lastScannedPackage) {
+                let timestamp = new Date().toLocaleString();
+                deliveries.push({ ...lastScannedPackage, timestamp });
+                alert(`✅ Package ${lastScannedPackage.packageID} delivered at Rack ${lastScannedPackage.rackID} (Position: ${lastScannedPackage.position})`);
+                
+                document.getElementById("confirmButton").classList.add("hidden");
+                document.getElementById("packageInput").value = "";
+                document.getElementById("result").innerText = "";
+
+                if (deliveries.length > 0) {
+                    document.getElementById("downloadReport").classList.remove("hidden");
+                }
+            }
+        }
+
+        function downloadCSV() {
+            let csvContent = "Rack ID,Package ID,Position,Timestamp\n" +
+                deliveries.map(d => `${d.rackID},${d.packageID},${d.position},${d.timestamp}`).join("\n");
+
+            let blob = new Blob([csvContent], { type: "text/csv" });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "delivery_report.csv";
+            link.click();
         }
 
         loadCSV();
