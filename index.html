@@ -6,7 +6,7 @@
     <title>Logistic Delivery Checker</title>
     <style>
         body {
-            background-color: #003478; /* Ford Blue */
+            background-color: #003478;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -25,7 +25,7 @@
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            width: 320px; /* Fixed width */
+            width: 320px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
@@ -65,32 +65,52 @@
     </div>
 
     <script>
-        let database = {
-            "RACK123": { "PKG001": "POS_A1", "PKG002": "POS_B2" },
-            "RACK124": { "PKG003": "POS_C3", "PKG004": "POS_D4" }
-        };
-        
+        let database = {};
+
+        // Load CSV file
+        function loadCSV() {
+            fetch('data.csv')
+                .then(response => response.text())
+                .then(text => {
+                    let rows = text.split("\n").slice(1); // Skip the header
+                    rows.forEach(row => {
+                        let [rack, packageID, position] = row.split(",");
+                        if (!database[rack]) database[rack] = {};
+                        database[rack][packageID] = position.trim();
+                    });
+                })
+                .catch(error => console.error("Error loading CSV:", error));
+        }
+
         let selectedRack = null;
 
         function scanRack() {
-            let rackID = document.getElementById("rackInput").value;
+            let rackID = document.getElementById("rackInput").value.trim();
+            let packageInput = document.getElementById("packageInput");
+
             if (database[rackID]) {
                 selectedRack = database[rackID];
-                document.getElementById("packageInput").disabled = false;
+                packageInput.disabled = false;
+                packageInput.value = "";
+                document.getElementById("result").innerText = "";
             } else {
                 selectedRack = null;
-                document.getElementById("packageInput").disabled = true;
+                packageInput.disabled = true;
+                packageInput.value = "";
             }
         }
 
         function scanPackage() {
-            let packageID = document.getElementById("packageInput").value;
+            let packageID = document.getElementById("packageInput").value.trim();
             if (selectedRack && selectedRack[packageID]) {
                 document.getElementById("result").innerText = "Package Position: " + selectedRack[packageID];
             } else {
-                document.getElementById("result").innerText = "";
+                document.getElementById("result").innerText = "Package not found!";
             }
         }
+
+        // Load CSV on startup
+        loadCSV();
     </script>
 
 </body>
