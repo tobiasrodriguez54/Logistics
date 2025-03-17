@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistic Delivery Checker</title>
+    <style>
+        body {
+            background-color: #003478; /* Ford Blue */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+        }
+        h2 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 320px; /* Fixed width */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+        }
+        p {
+            font-weight: bold;
+            color: #003478;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Logistic Delivery Checker</h2>
+    <div class="container">
+        <label>Scan Rack ID:</label>
+        <input type="text" id="rackInput" oninput="scanRack()">
+        
+        <label>Scan Package ID:</label>
+        <input type="text" id="packageInput" oninput="scanPackage()" disabled>
+        
+        <p id="result"></p>
+    </div>
+
+    <script>
+        let database = {
+            "RACK123": { "PKG001": "POS_A1", "PKG002": "POS_B2" },
+            "RACK124": { "PKG003": "POS_C3", "PKG004": "POS_D4" }
+        };
+        
+        let selectedRack = null;
+
+        function scanRack() {
+            let rackID = document.getElementById("rackInput").value;
+            if (database[rackID]) {
+                selectedRack = database[rackID];
+                document.getElementById("packageInput").disabled = false;
+            } else {
+                selectedRack = null;
+                document.getElementById("packageInput").disabled = true;
+            }
+        }
+
+        function scanPackage() {
+            let packageID = document.getElementById("packageInput").value;
+            if (selectedRack && selectedRack[packageID]) {
+                document.getElementById("result").innerText = "Package Position: " + selectedRack[packageID];
+            } else {
+                document.getElementById("result").innerText = "";
+            }
+        }
+    </script>
+
+</body>
+</html>
