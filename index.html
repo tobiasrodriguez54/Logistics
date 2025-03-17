@@ -19,35 +19,63 @@
             color: white;
             text-align: center;
             margin-bottom: 20px;
+            font-size: 24px;
         }
         .container {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 25px;
+            border-radius: 12px;
             text-align: center;
-            width: 320px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: transform 0.2s ease-in-out;
+        }
+        .container:hover {
+            transform: scale(1.02);
         }
         label {
             font-weight: bold;
             margin-top: 10px;
+            font-size: 16px;
+            color: #003478;
         }
         input {
             width: 90%;
-            padding: 10px;
+            padding: 12px;
             margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            border: 2px solid #003478;
+            border-radius: 6px;
             font-size: 16px;
             text-align: center;
+            outline: none;
+            transition: border 0.3s ease;
+        }
+        input:focus {
+            border: 2px solid #007bff;
+        }
+        .scan-button {
+            margin-top: 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .scan-button:hover {
+            background: #0056b3;
         }
         p {
             font-weight: bold;
             color: #003478;
             margin-top: 15px;
+            font-size: 18px;
+            min-height: 24px;
         }
     </style>
 </head>
@@ -56,10 +84,12 @@
     <h2>Logistic Delivery Checker</h2>
     <div class="container">
         <label>Scan Rack ID:</label>
-        <input type="text" id="rackInput" oninput="scanRack()">
+        <input type="text" id="rackInput" oninput="scanRack()" placeholder="Enter or scan rack ID">
         
         <label>Scan Package ID:</label>
-        <input type="text" id="packageInput" oninput="scanPackage()" disabled>
+        <input type="text" id="packageInput" oninput="scanPackage()" placeholder="Enter or scan package ID" disabled>
+        
+        <button class="scan-button" onclick="simulateScan()">📸 Scan Barcode</button>
         
         <p id="result"></p>
     </div>
@@ -67,12 +97,11 @@
     <script>
         let database = {};
 
-        // Load CSV file
         function loadCSV() {
             fetch('data.csv')
                 .then(response => response.text())
                 .then(text => {
-                    let rows = text.split("\n").slice(1); // Skip the header
+                    let rows = text.split("\n").slice(1);
                     rows.forEach(row => {
                         let [rack, packageID, position] = row.split(",");
                         if (!database[rack]) database[rack] = {};
@@ -103,13 +132,16 @@
         function scanPackage() {
             let packageID = document.getElementById("packageInput").value.trim();
             if (selectedRack && selectedRack[packageID]) {
-                document.getElementById("result").innerText = "Package Position: " + selectedRack[packageID];
+                document.getElementById("result").innerText = "📦 Position: " + selectedRack[packageID];
             } else {
-                document.getElementById("result").innerText = "Package not found!";
+                document.getElementById("result").innerText = "❌ Package not found!";
             }
         }
 
-        // Load CSV on startup
+        function simulateScan() {
+            alert("Barcode scanner feature coming soon!");
+        }
+
         loadCSV();
     </script>
 
