@@ -56,20 +56,6 @@
         input:focus {
             border: 2px solid #007bff;
         }
-        .scan-button {
-            margin-top: 15px;
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        .scan-button:hover {
-            background: #0056b3;
-        }
         p {
             font-weight: bold;
             color: #003478;
@@ -88,8 +74,6 @@
         
         <label>Scan Package ID:</label>
         <input type="text" id="packageInput" oninput="scanPackage()" placeholder="Enter or scan package ID" disabled>
-        
-        <button class="scan-button" onclick="simulateScan()">📸 Scan Barcode</button>
         
         <p id="result"></p>
     </div>
@@ -136,10 +120,6 @@
             } else {
                 document.getElementById("result").innerText = "❌ Package not found!";
             }
-        }
-
-        function simulateScan() {
-            alert("Barcode scanner feature coming soon!");
         }
 
         loadCSV();
